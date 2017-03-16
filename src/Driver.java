@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -13,6 +14,8 @@ import java.util.Scanner;
 
 public class Driver {
 	private static int[][] puzzle = new int[9][9];
+	private static boolean solved = false;
+	private static ArrayList<Cell> allCells = new ArrayList<Cell>();
 	
 	public int[][] getPuzzle()
 	{
@@ -40,7 +43,6 @@ public class Driver {
 		{
 			File file = new File (fileName);
 			Scanner scanner = new Scanner(file);
-			Solving solving = new Solving();
 			
 			System.out.println("Initial solution: ");
 			while (scanner.hasNext())
@@ -59,8 +61,9 @@ public class Driver {
 			System.out.println();
 			
 			scanner.close();
+
 			int count = 0;
-			do
+			while(!solved)
 			{
 				for(int i = 0; i < 9; i++)
 				{
@@ -69,35 +72,30 @@ public class Driver {
 						System.out.println("Solving for: " + i + " " + j);
 						if (puzzle[i][j] == 0)
 						{
-							Remainder r = new Remainder();
+							Cell cell = new Cell(i, j);
+							cell.findPossibilities();
+							allCells.add(cell);
 							
-							r.setiValue(i);
-							r.setjValue(j);
-//							System.out.println("The R values: " + r.getiValue() + " " + r.getjValue());
-							if (!solving.isInSolving(i, j))
+							if (cell.getPossibilitySize() == 1)
 							{
-								System.out.println("ADDING TO SOLVING");
-								solving.addToSolving(r);
-							}
-//							solving.getSolving();
-	
-							r.findPossibilities();
-//							System.out.print("Printing possibilities: ");
-//							r.printPossibilities();
-							if (r.getPossibilitySize() == 1)
-							{
-								puzzle[i][j] = r.getOnlyPossibility();
-								solving.removeFromSolving(r);
+								puzzle[i][j] = cell.getOnlyPossibility();
 							}
 						}
 					}
 				}
-				System.out.println("Solving size: " + solving.getSolvingSize());
-				
+				count++;
+				if (count > 3)
+					solved = true;
 			}
-			while(solving.getSolvingSize() > 1);
 			
-			System.out.println("Puzzle after one iteration: ");
+			System.out.println("All cell possibilities: ");
+			for(Cell cell : allCells)
+			{
+				cell.printPossibilities();				
+			}
+
+			
+			System.out.println("Puzzle after: ");
 			printPuzzle();
 			
 		}
