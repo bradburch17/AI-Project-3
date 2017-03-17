@@ -9,7 +9,8 @@ public class Cell {
 	private int[][] puzzle = d.getPuzzle();
 	private int[][] smallPuzzle = new int[3][3];
 	
-	public Cell(int xValue, int yValue)
+	//Initiates new instance of Cell with the yValue, xValue, and a new possibilities ArrayList
+	public Cell(int yValue, int xValue)
 	{
 		possibilities = new ArrayList<Integer>() {{
 		    add(1); add(2);  add(3);
@@ -21,26 +22,35 @@ public class Cell {
 		this.yValue = yValue;
 	}
 	
+	//Returns the size of possibilities 
 	public int getPossibilitySize()
 	{
 		return possibilities.size();
 	}
 	
+	public int getXValue()
+	{
+		return xValue;
+	}
+	
+	public int getYValue()
+	{
+		return yValue;
+	}
+	
+	//Returns the X and Y positions of the current cell 
+	public String getXY()
+	{
+		return "X: " + xValue + " Y: " + yValue;
+	}
+	
+	//Returns the only possibility left in the possibilites list
 	public int getOnlyPossibility()
 	{
 		return possibilities.get(0);
 	}
 	
-	public void printPossibilities()
-	{
-		System.out.print("Cell at: " + xValue + " " + yValue + ":  ");
-		for(int i = 0; i < possibilities.size();i++)
-		{
-			System.out.print(possibilities.get(i) + " ");
-		}
-		System.out.println();
-	}
-	
+	//Finds the possibilities of the current cell by first going through the row, column, 
 	public void findPossibilities()
 	{
 		//Searches through the row
@@ -48,7 +58,7 @@ public class Cell {
 		{
 			if (possibilities.contains(puzzle[yValue][j]))
 			{
-				System.out.println("Found on x:" +  puzzle[xValue][j]);
+				System.out.println("Found on x:" +  puzzle[yValue][j]);
 				possibilities.remove(Integer.valueOf(puzzle[yValue][j]));
 			}
 		}
@@ -64,8 +74,8 @@ public class Cell {
 		}
 		
 		//Searches through the square
-		int rowOffset = (xValue / 3) * 3;
-		int columnOffset = (yValue / 3) * 3;
+		int rowOffset = (yValue / 3) * 3;
+		int columnOffset = (xValue / 3) * 3;
 		
 		for(int i = 0; i < 3; i++)
 		{
@@ -81,6 +91,17 @@ public class Cell {
 		}
 		
 //		printSmallPuzzle();
+	}
+	
+	//Prints the possibilities ArrayList
+	public void printPossibilities()
+	{
+		System.out.print("Cell at: " + xValue + " " + yValue + ":  ");
+		for(int i = 0; i < possibilities.size();i++)
+		{
+			System.out.print(possibilities.get(i) + " ");
+		}
+		System.out.println();
 	}
 	
 	public void printSmallPuzzle()
