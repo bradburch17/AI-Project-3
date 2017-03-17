@@ -71,6 +71,68 @@ public class Driver {
 		solving.remove(remove);
 	}
 	
+	//Checks if there is only one possibility based on the column, row, square
+	public static void checkMedium(Cell cell)
+	{
+		ArrayList<Integer> originalCellPossibilities = cell.getPossibilities(); //Sets the current cell possibilities 
+		ArrayList<Integer> newCellPossibilities;
+		ArrayList<Integer> notSame = new ArrayList<Integer>(); //List for the numbers not the same
+		
+		//Adding all numbers to the notSame list
+		for(Cell c : solving)
+		{
+			//Checks the current cell and new cell's row and column. Currently not doing the square, because it required more code.
+			if (c.getXValue() == cell.getXValue() || cell.getYValue() == c.getYValue())
+			{
+				newCellPossibilities = c.getPossibilities();
+				for(int i = 0; i < originalCellPossibilities.size(); i++)
+				{
+					//Checks if any of the possibilities in the original cell are within the new cell 
+					if (newCellPossibilities.contains(originalCellPossibilities.get(i)))
+					{
+						//Do nothing
+					}
+					else 
+					{
+						//Checks if the cell already contains the number
+						if (!notSame.contains(originalCellPossibilities.get(i)))
+						{
+							notSame.add(originalCellPossibilities.get(i));
+						}
+					}	
+				}
+			}
+		}
+		
+		System.out.print("What is in the notSame arrayList: ");
+		for(int i = 0; i < notSame.size(); i++)
+		{
+			System.out.print(notSame.get(i) + " ");
+		}
+		System.out.println();
+		
+		//Checks if the numbers are in the notSame list. 
+		for(Cell c : solving)
+		{
+			if (cell.getXValue() == c.getXValue() || cell.getYValue() == c.getYValue())
+			{
+				if(notSame.contains(puzzle[c.getYValue()][c.getXValue()]))
+				{
+					//Remove the number if it is found in the puzzle and notSame (indicating that it is a possibility in another cell)
+					//Currently does not work
+					notSame.remove(puzzle[c.getYValue()][c.getXValue()]);
+				}
+			}
+		}
+		
+		System.out.print("What is in the notSame arrayList after checking again: ");
+		for(int i = 0; i < notSame.size(); i++)
+		{
+			System.out.print(notSame.get(i) + " ");
+		}
+		System.out.println();
+	}
+	
 	//Main method 
 	public static void main(String[] args)
 	{
@@ -105,7 +167,6 @@ public class Driver {
 			
 			scanner.close();
 
-			int count = 0;
 			while(!isSolved())
 			{
 				for(int i = 0; i < 9; i++)
@@ -120,9 +181,11 @@ public class Driver {
 							allCells.add(cell);
 							if (!isInSolving(cell))
 							{
-								System.out.println("Adding to solving");
+//								System.out.println("Adding to solving");
 								solving.add(cell);
 							}
+							
+							checkMedium(cell);
 							
 							if (cell.getPossibilitySize() == 0)
 							{
@@ -132,16 +195,14 @@ public class Driver {
 							
 							if (cell.getPossibilitySize() == 1)
 							{
-								System.out.println("Adding: " + cell.getXY());
+//								System.out.println("Adding: " + cell.getXY());
 								puzzle[i][j] = cell.getOnlyPossibility();
 								removeFromSolving(i, j);
 							}
 						}
 					}
 				}
-//				count++;
-//				if (count > 3)
-//					solved = true;
+				solving.clear();
 			}
 			System.out.println("Solving size: " + solving.size());
 			System.out.println("All cell possibilities: ");
@@ -149,7 +210,6 @@ public class Driver {
 			{
 				cell.printPossibilities();				
 			}
-
 			
 			System.out.println("Solved puzzle: ");
 			printPuzzle();
