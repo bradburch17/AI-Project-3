@@ -4,6 +4,7 @@ public class Cell {
 
 	private int xValue;
 	private int yValue;
+	private int[] squareValue = new int[2];
 	private ArrayList<Integer> possibilities;
 	private Driver d = new Driver();
 	private int[][] puzzle = d.getPuzzle();
@@ -43,24 +44,25 @@ public class Cell {
 		return yValue;
 	}
 	
-	public void getSquareValues()
+	public int[] getSquareValue()
+	{
+		return squareValue;
+	}
+	
+	public int[][] getSmallSquare()
 	{
 		//Searches through the square
 		int rowOffset = (yValue / 3) * 3;
 		int columnOffset = (xValue / 3) * 3;
-		
+
 		for(int i = 0; i < 3; i++)
 		{
 			for(int j = 0; j < 3; j++)
 			{
 				smallPuzzle[i][j] = puzzle[i + rowOffset][j + columnOffset];
-				if (possibilities.contains(puzzle[i + rowOffset][j + columnOffset]))
-				{
-//					System.out.println("Found in square: " + puzzle[i + rowOffset][j + columnOffset]);
-					possibilities.remove(Integer.valueOf(puzzle[i + rowOffset][j + columnOffset]));
-				}
 			}
 		}
+		return smallPuzzle;
 	}
 	
 	//Returns the X and Y positions of the current cell 
@@ -84,7 +86,7 @@ public class Cell {
 			if (possibilities.contains(puzzle[yValue][j]))
 			{
 //				System.out.println("Found on x:" +  puzzle[yValue][j]);
-				possibilities.remove(Integer.valueOf(puzzle[yValue][j]));
+				possibilities.remove(possibilities.indexOf(puzzle[yValue][j]));
 			}
 		}
 		
@@ -94,13 +96,15 @@ public class Cell {
 			if (possibilities.contains(puzzle[i][xValue]))
 			{
 //				System.out.println("Found on y: " +  puzzle[i][xValue]);
-				possibilities.remove(Integer.valueOf(puzzle[i][xValue]));
+				possibilities.remove(possibilities.indexOf(puzzle[i][xValue]));
 			}
 		}
 		
 		//Searches through the square
 		int rowOffset = (yValue / 3) * 3;
 		int columnOffset = (xValue / 3) * 3;
+		squareValue[0] = rowOffset;
+		squareValue[1] = columnOffset;
 		
 		for(int i = 0; i < 3; i++)
 		{
@@ -110,7 +114,7 @@ public class Cell {
 				if (possibilities.contains(puzzle[i + rowOffset][j + columnOffset]))
 				{
 //					System.out.println("Found in square: " + puzzle[i + rowOffset][j + columnOffset]);
-					possibilities.remove(Integer.valueOf(puzzle[i + rowOffset][j + columnOffset]));
+					possibilities.remove(possibilities.indexOf(puzzle[i + rowOffset][j + columnOffset]));
 				}
 			}
 		}
@@ -121,7 +125,7 @@ public class Cell {
 	//Prints the possibilities ArrayList
 	public void printPossibilities()
 	{
-		System.out.print("Cell at: " + xValue + " " + yValue + ":  ");
+		System.out.print("Cell at: " + yValue + " " + xValue + ":  ");
 		for(int i = 0; i < possibilities.size();i++)
 		{
 			System.out.print(possibilities.get(i) + " ");

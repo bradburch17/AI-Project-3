@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 
 /**
@@ -74,63 +75,72 @@ public class Driver {
 	//Checks if there is only one possibility based on the column, row, square
 	public static void checkMedium(Cell cell)
 	{
-		ArrayList<Integer> originalCellPossibilities = cell.getPossibilities(); //Sets the current cell possibilities 
+		ArrayList<Integer> originalCellPossibilities = new ArrayList<Integer>( cell.getPossibilities() ); //Sets the current cell possibilities Is this a pointer error? 
 		ArrayList<Integer> newCellPossibilities;
-		ArrayList<Integer> notSame = new ArrayList<Integer>(); //List for the numbers not the same
 		
-		//Adding all numbers to the notSame list
 		for(Cell c : solving)
 		{
-			//Checks the current cell and new cell's row and column. Currently not doing the square, because it required more code.
-			if (c.getXValue() == cell.getXValue() || cell.getYValue() == c.getYValue())
+			
+			if(cell.getXValue() == c.getXValue() || cell.getYValue() == c.getYValue())
 			{
-				newCellPossibilities = c.getPossibilities();
-				for(int i = 0; i < originalCellPossibilities.size(); i++)
+				newCellPossibilities = new ArrayList<Integer>(c.getPossibilities());
+				
+				for(int i = 0; i < newCellPossibilities.size();i++)
 				{
-					//Checks if any of the possibilities in the original cell are within the new cell 
-					if (newCellPossibilities.contains(originalCellPossibilities.get(i)))
+					if (originalCellPossibilities.contains(newCellPossibilities.get(i)))
 					{
-						//Do nothing
+						originalCellPossibilities.remove(originalCellPossibilities.indexOf(newCellPossibilities.get(i)));
 					}
-					else 
-					{
-						//Checks if the cell already contains the number
-						if (!notSame.contains(originalCellPossibilities.get(i)))
-						{
-							notSame.add(originalCellPossibilities.get(i));
-						}
-					}	
 				}
 			}
-		}
-		
-		System.out.print("What is in the notSame arrayList: ");
-		for(int i = 0; i < notSame.size(); i++)
-		{
-			System.out.print(notSame.get(i) + " ");
-		}
-		System.out.println();
-		
-		//Checks if the numbers are in the notSame list. 
-		for(Cell c : solving)
-		{
-			if (cell.getXValue() == c.getXValue() || cell.getYValue() == c.getYValue())
+			
+			if (checkSquare(cell, c) && !(cell.getXValue() == c.getXValue() && cell.getYValue() == c.getYValue()))
 			{
-				if(notSame.contains(puzzle[c.getYValue()][c.getXValue()]))
+				//System.out.println("Compare: ");
+				//cell.printSmallPuzzle();
+				//System.out.println();
+				//c.printSmallPuzzle();
+				//System.out.println("----------------");
+				newCellPossibilities = new ArrayList<Integer>(c.getPossibilities());
+				//c.printPossibilities();
+				//cell.printPossibilities();
+				for(int i = 0; i < newCellPossibilities.size(); i++)
 				{
-					//Remove the number if it is found in the puzzle and notSame (indicating that it is a possibility in another cell)
-					//Currently does not work
-					notSame.remove(puzzle[c.getYValue()][c.getXValue()]);
+					//System.out.println("New Cell Poss: " + newCellPossibilities.get(i));
+					if (originalCellPossibilities.contains(newCellPossibilities.get(i)))
+					{
+						System.out.println("Not the same and they contained! " + newCellPossibilities.get(i));
+						originalCellPossibilities.remove(originalCellPossibilities.indexOf(newCellPossibilities.get(i)));
+					}
 				}
+				//System.out.println("End!");
+			}
+
+		}
+		
+		if(originalCellPossibilities.size() == 1)
+		{
+			System.out.println("There was one thing in the array! " + originalCellPossibilities.get(0));
+			puzzle[cell.getYValue()][cell.getXValue()] = originalCellPossibilities.get(0);
+			//System.exit(0);
+		}
+		System.out.println();
+	}
+	
+	public static boolean checkSquare(Cell cell, Cell c)
+	{
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < 3; j++)
+			{
+				if (!(cell.getSmallSquare()[i][j] == c.getSmallSquare()[i][j]))
+				{
+					return false;
+				} 
 			}
 		}
 		
-		System.out.print("What is in the notSame arrayList after checking again: ");
-		for(int i = 0; i < notSame.size(); i++)
-		{
-			System.out.print(notSame.get(i) + " ");
-		}
-		System.out.println();
+		return true;
 	}
 	
 	//Main method 
@@ -141,7 +151,7 @@ public class Driver {
 		
 		
 		System.out.println("This program is used to solve a sudoku puzzle");
-		System.out.print("Please enter a file you would like to create the alogrithm: ");
+		System.out.print("Please enter a sudoku puzzle: ");
 		
 		fileName = reader.nextLine();
 		
@@ -178,10 +188,9 @@ public class Driver {
 						{
 							Cell cell = new Cell(i, j);
 							cell.findPossibilities();
-							allCells.add(cell);
+							
 							if (!isInSolving(cell))
 							{
-//								System.out.println("Adding to solving");
 								solving.add(cell);
 							}
 							
@@ -203,12 +212,6 @@ public class Driver {
 					}
 				}
 				solving.clear();
-			}
-			System.out.println("Solving size: " + solving.size());
-			System.out.println("All cell possibilities: ");
-			for(Cell cell : allCells)
-			{
-				cell.printPossibilities();				
 			}
 			
 			System.out.println("Solved puzzle: ");
