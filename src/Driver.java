@@ -75,20 +75,23 @@ public class Driver {
 	//Checks if there is only one possibility based on the column, row, square
 	public static void checkMedium(Cell cell)
 	{
-		ArrayList<Integer> originalCellPossibilities = new ArrayList<Integer>( cell.getPossibilities() ); //Sets the current cell possibilities Is this a pointer error? 
+		ArrayList<Integer> originalCellPossibilities = new ArrayList<Integer>( cell.getPossibilities() ); //Sets the current cell possibilities
 		ArrayList<Integer> newCellPossibilities;
 		
 		for(Cell c : solving)
 		{
 			
-			if(cell.getXValue() == c.getXValue() || cell.getYValue() == c.getYValue())
+			if((cell.getXValue() == c.getXValue() ^ cell.getYValue() == c.getYValue()))
 			{
+				System.out.println("Orig Cell: " + cell.getYValue() + " " + cell.getXValue());
+				System.out.println("New  Cell: " + c.getYValue() + " " + c.getXValue());
 				newCellPossibilities = new ArrayList<Integer>(c.getPossibilities());
 				
 				for(int i = 0; i < newCellPossibilities.size();i++)
 				{
 					if (originalCellPossibilities.contains(newCellPossibilities.get(i)))
 					{
+						System.out.println("Removing: " + newCellPossibilities.get(i));
 						originalCellPossibilities.remove(originalCellPossibilities.indexOf(newCellPossibilities.get(i)));
 					}
 				}
@@ -96,49 +99,46 @@ public class Driver {
 			
 			if (checkSquare(cell, c) && !(cell.getXValue() == c.getXValue() && cell.getYValue() == c.getYValue()))
 			{
-				//System.out.println("Compare: ");
-				//cell.printSmallPuzzle();
-				//System.out.println();
-				//c.printSmallPuzzle();
-				//System.out.println("----------------");
 				newCellPossibilities = new ArrayList<Integer>(c.getPossibilities());
-				//c.printPossibilities();
-				//cell.printPossibilities();
+				c.printPossibilities();
+				System.out.print("Original Cell: ");
+				for(int i = 0; i < originalCellPossibilities.size(); i++)
+				{
+					System.out.print(originalCellPossibilities.get(i) + " ");
+				}
+				System.out.println();
 				for(int i = 0; i < newCellPossibilities.size(); i++)
 				{
-					//System.out.println("New Cell Poss: " + newCellPossibilities.get(i));
 					if (originalCellPossibilities.contains(newCellPossibilities.get(i)))
 					{
 						System.out.println("Not the same and they contained! " + newCellPossibilities.get(i));
 						originalCellPossibilities.remove(originalCellPossibilities.indexOf(newCellPossibilities.get(i)));
 					}
 				}
-				//System.out.println("End!");
 			}
 
 		}
+		
+		System.out.print("What's in original cell?: ");
+		for(int i = 0; i < originalCellPossibilities.size(); i++)
+		{
+			System.out.print(originalCellPossibilities.get(i) + " ");
+		}
+		System.out.println();
 		
 		if(originalCellPossibilities.size() == 1)
 		{
 			System.out.println("There was one thing in the array! " + originalCellPossibilities.get(0));
 			puzzle[cell.getYValue()][cell.getXValue()] = originalCellPossibilities.get(0);
-			//System.exit(0);
+			printPuzzle();
 		}
 		System.out.println();
 	}
 	
 	public static boolean checkSquare(Cell cell, Cell c)
 	{
-		for(int i = 0; i < 3; i++)
-		{
-			for(int j = 0; j < 3; j++)
-			{
-				if (!(cell.getSmallSquare()[i][j] == c.getSmallSquare()[i][j]))
-				{
-					return false;
-				} 
-			}
-		}
+		if (!(cell.getSquareValue()[0] == c.getSquareValue()[0] && cell.getSquareValue()[1] == c.getSquareValue()[1]))
+			return false;
 		
 		return true;
 	}
